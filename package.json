@@ -1,0 +1,24 @@
+{
+  "name": "abi_website",
+  "version": "1.0.0",
+  "description": "abitur website ",
+  "main": "server.js",
+  "dependencies": {
+    "express": "^4.17.1",
+    "express-fileupload": "^1.1.6",
+    "express-session": "^1.17.0",
+    "mysql": "^2.18.1",
+    "node-sass": "^4.13.1",
+    "node-sass-middleware": "^0.11.0",
+    "nodemon": "^2.0.2",
+    "pug": "^2.0.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "npx nodemon server.js",
+    "build:sass": "node-sass src/stylesheets/style.sass -o public/css"
+  },
+  "author": "",
+  "license": "ISC"
+}

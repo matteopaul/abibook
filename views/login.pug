@@ -1,0 +1,14 @@
+extends default
+
+block content
+  if error
+    div.error-message
+      p
+        | #{error}
+  
+  div.container-detail  
+      h1 Login
+      form(action="/auth" method="POST")
+        input.input-text--size-lg(type="text" name="username" placeholder="username" autocomplete="off")
+        input.input-text--size-lg(type="text" name="password" placeholder="passwort" autocomplete="off")
+        input.button--size-md(type="submit")

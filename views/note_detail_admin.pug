@@ -1,0 +1,5 @@
+extends note_detail
+
+block controls
+  form(action=`/profile/${note.profile_id}/notes/${note.id}/delete`, method="POST")
+    input(type="submit", value="[ löschen ]")

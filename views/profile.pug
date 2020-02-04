@@ -1,0 +1,17 @@
+extends default
+
+block content
+    
+  div.container
+    div.list-item.list-item-headline
+      h2 Profil von #{user.firstname} #{user.lastname}
+    div.container-scroll
+      each note in notes
+        div.list-item
+          p 
+            a(href=`/profile/${user.id}/notes/${note.id}`)
+              | #{note.text}
+  div.input-form
+    form(action=`/profile/${user.id}/notes/add` method="POST")
+      textarea(name="text" placeholder="schreibe ein paar eigenschaften..." required)
+      input(type="submit" value="senden")

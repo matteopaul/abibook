@@ -1,0 +1,21 @@
+doctype html
+html
+  head
+    if title
+      title #{title}
+    else 
+      title Abibuch
+    link(rel='stylesheet', href='/css/style.css')
+    meta(name="viewport" content="width=device-width, initial-scale=1")
+  body
+    main
+      block header
+        if current_user
+          header.header
+            div.logo
+              h1 Abibuch 2021
+            div.account
+              a(href=`/profile/${current_user.id}`)
+                h3 #{current_user.firstname} #{current_user.lastname}
+              a(href="/logout") logout
+      block content

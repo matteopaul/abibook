@@ -1,0 +1,14 @@
+extends default
+
+block content
+  div.container-detail
+    h3 Wisst ihr noch, als...
+    div.container 
+      p ...#{post.text}
+      block controls
+      small Von 
+        a(href=`/profile/${user.id}`)
+          | #{user.firstname} #{user.lastname}
+      br 
+      a.link--size-sm(href="/")
+        | <
