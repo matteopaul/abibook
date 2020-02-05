@@ -1,0 +1,12 @@
+extends default
+
+block content
+  div.container
+    div.list-item.list-item-headline
+      h1 Umfragen
+    div.container-scroll.container-scroll--size-lg
+      each poll in polls
+        a(href=`/poll/${poll.id}`)
+          div.list-item.list-item--size-md
+            p
+              | #{poll.title}

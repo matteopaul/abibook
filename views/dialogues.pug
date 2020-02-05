@@ -1,0 +1,16 @@
+extends default
+
+block content
+  div.container
+    div.list-item.list-item-headline
+      h1 Dialoge
+    div.container-scroll
+      each dialogue in dialogues
+        div.list-item
+          p.title
+            a(href=`/dialogues/${dialogue.id}`)
+              | #{dialogue.text} 
+  div.input-form
+    form(action="/add_dialogue" method="POST")
+      textarea(name="text" required)
+      input(type="submit")

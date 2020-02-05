@@ -1,0 +1,15 @@
+extends default
+
+block content
+  div.container-detail
+    h3 #{poll.title}
+    div.container-scroll
+      each answer in poll_answers
+        div.list-item
+          a(href=`/poll/${poll.id}/answer/${answer.id}`)
+            p
+              | #{answer.title}
+    div.input-field
+      form(action=`/poll/${poll.id}/add`, method="POST")
+        input.input-text--size-lg(type="text", name="text", placeholder="deine antwort")
+        input.button--size-md(type="submit")

@@ -13,7 +13,17 @@ html
         if current_user
           header.header
             div.logo
-              h1 Abibuch 2021
+              a(href="/")
+                h1 Abibuch 2021
+            div.navbar
+              | [ 
+              a.link--size-sm(href="/profiles")
+                | profile
+              a.link--size-sm(href="/poll")
+                | umfragen
+              a.link--size-sm(href="/dialogues")
+                | dialoge
+              |  ]
             div.account
               a(href=`/profile/${current_user.id}`)
                 h3 #{current_user.firstname} #{current_user.lastname}

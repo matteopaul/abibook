@@ -1,0 +1,12 @@
+extends default
+
+block content
+  div.container
+    div.list-item.list-item-headline
+      h1 Profilübersicht
+  div.container-scroll.container-scroll--size-lg
+    each user in users
+      a(href=`/profile/${user.id}`)
+        div.list-item
+          p
+            | #{user.firstname} #{user.lastname}

@@ -2,6 +2,9 @@ a
   color: $black
 
 .error-message
+  -webkit-animation: fadeOut 4s
+  animation: fadeOut 4s
+  animation-fill-mode: forwards
   z-index: 50
   width: 100%
   margin-top: 40px
@@ -9,6 +12,27 @@ a
   background-color: rgba(255, 0, 0, 0.2)
   border: 1px solid rgba(255, 0, 0, 0.5)
   @extend %padding-md
+
+@-webkit-keyframes fadeOut
+    0%
+      opacity: 0
+    10%
+      opacity: 1
+    90%
+      opacity: 1
+    100%
+      opacity: 0
+
+
+@keyframes fadeOut
+    0%
+      opacity: 0
+    10%
+      opacity: 1
+    90%
+      opacity: 1
+    100%
+      opacity: 0
 
 .input-text--size-lg
   height: 40px
@@ -28,12 +52,19 @@ a
   width: 100%
   display: flex
 
-  .logo, .account
+  .logo, .account, .navbar
     position: relative
-    width: 50%
+    width: 33%
     height: 100%
     text-align: right
+    box-sizing: border-box
     @extend %padding-md
+
+  .navbar
+    text-align: center
+
+    .link--size-sm
+      @extend %padding-sm
 
   .logo
     text-align: left
@@ -50,10 +81,21 @@ a
   &:first-child
     margin-top: 0
 
+  &--size-md
+    width: calc(50% - 16px)
+    display: inline-block
+
+    &:nth-child(2n-2)
+      margin-left: 16px
+    &:nth-child(2n+1)
+      margin-right: 16px
+
 .container-scroll
   overflow-y: scroll
   overflow-x: scroll
   max-height: 540px
+  &--size-lg
+    max-height: calc(100% - 64px - 110px)
 
 .input-form
   height: 128px
@@ -64,13 +106,6 @@ a
   textarea
     width: 100%
     height: 80px
-
-  input
-    width: 72px
-    height: 24px
-    float: right
-    color: $white
-    background-color: $light-gray
 
 .container-detail
   width: 100%
