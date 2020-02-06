@@ -24,6 +24,8 @@ SET NAMES utf8mb4;
 # Dump of table dialogues
 # ------------------------------------------------------------
 
+USE abi;
+
 DROP TABLE IF EXISTS `dialogues`;
 
 CREATE TABLE `dialogues` (
