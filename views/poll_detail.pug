@@ -5,10 +5,16 @@ block content
     h3 #{poll.title}
     div.container-scroll
       each answer in poll_answers
-        div.list-item
-          a(href=`/poll/${poll.id}/answer/${answer.id}`)
+        if selected_answer_id == answer.id
+          div.list-item.list-item--color-green
             p
               | #{answer.title}
+        else
+          div.list-item
+            a(onclick="this.getElementsByTagName('form')[0].submit();")
+              p
+                | #{answer.title}
+              form.nosize(action=`/poll/${poll.id}/answer/${answer.id}/vote`, method="POST")
     div.input-field
       form(action=`/poll/${poll.id}/add`, method="POST")
         input.input-text--size-lg(type="text", name="text", placeholder="deine antwort")

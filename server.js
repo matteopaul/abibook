@@ -19,7 +19,7 @@ database.connect(function(err) {
   console.log("Connected!");
 });
 
-const server = app.listen(8080, () => {
+const server = app.listen(80, () => {
   console.log(`express running at ${server.address().port}`);
 })
 
@@ -233,21 +233,25 @@ app.get('/profile/:id', function(req, res) {
 app.post('/profile/:id/notes/add', function(req, res) {
   if(req.session.loggedin) {
 
-    let user_id = req.params.id;
-    let text = req.body.text;
+    if(req.body.text != "") {
+      let user_id = req.params.id;
+      let text = req.body.text;
 
-    database.query("SELECT * FROM user WHERE username = ?", [req.session.username], function(error, result, fields) {
-      if(result.length > 0) {
-        let author_id = result[0].id;
+      database.query("SELECT * FROM user WHERE username = ?", [req.session.username], function(error, result, fields) {
+        if(result.length > 0) {
+          let author_id = result[0].id;
 
-        database.query('INSERT INTO personal_notes (`author_id`, `profile_id`, `text`) VALUES (' + author_id + ', ' + user_id + ', "' + text + '")', function(err, insert_result) {
-           if (err) throw err;
-           res.redirect('/profile/' + user_id);
-        })
-      } else {
-        res.redirect('/logout');
-      }
-    })
+          database.query('INSERT INTO personal_notes (`author_id`, `profile_id`, `text`) VALUES (' + author_id + ', ' + user_id + ', "' + text + '")', function(err, insert_result) {
+             if (err) throw err;
+             res.redirect('/profile/' + user_id);
+          })
+        } else {
+          res.redirect('/logout');
+        }
+      })
+    } else {
+      res.redirect(`/profile/${profile_id}`)
+    }
   } else {
     res.redirect('/login')
   }
@@ -391,12 +395,12 @@ app.get('/dialogues/:id', function(req, res) {
         database.query("SELECT * FROM user WHERE id = ?", [result[0].author_id], function(author_error, author_result, author_fields) {
           if(author_result.length > 0) {
             if(author_result[0].username.toLowerCase() == req.session.username.toLowerCase()) {
-              res.render('moment_detail_admin', {
+              res.render('dialogue_detail_admin', {
                 post: result[0],
                 user: author_result[0]
               })
             } else {
-              res.render('moment_detail', {
+              res.render('dialogue_detail', {
                 post: result[0],
                 user: author_result[0]
               })
@@ -407,6 +411,32 @@ app.get('/dialogues/:id', function(req, res) {
         res.redirect('/')
       }
     })
+  } else {
+    res.redirect('/login');
+  }
+})
+
+app.post('/dialogues/:id/delete', function(req, res) {
+  if(req.session.loggedin) {
+    let dialogue_id = req.params.id;
+    database.query("SELECT * FROM user WHERE username = ?", [req.session.username], function(error, result, fields) {
+      if(result.length > 0) {
+        database.query("SELECT * FROM dialogues WHERE id = ?", [dialogue_id], function(dialogue_error, dialogue_result, dialogue_fields) {
+          if(dialogue_result.length > 0) {
+            if(result[0].id == dialogue_result[0].author_id) {
+              database.query("DELETE FROM dialogues WHERE id = ?", [dialogue_id], function(delete_error) {
+                if (delete_error) throw delete_error;
+                res.redirect(`/dialogues`);
+              })
+            } else {
+              res.redirect(`/dialogues/${dialogue_id}`);
+            }
+          }
+        })
+      } else {
+        res.redirect('/logout');
+      }
+    });
   } else {
     res.redirect('/login');
   }
@@ -446,19 +476,31 @@ app.get('/poll/:id', function(req, res) {
   let poll_id = req.params.id;
   console.log(poll_id);
   if(req.session.loggedin) {
-    // GET CURRENT POLL
-    database.query("SELECT * FROM poll WHERE id = ?", [poll_id], function(poll_error, poll_result, poll_fields) {
-      if(poll_result.length > 0) {
-        // CURRENT POLL GOT
-        // GET ANSWERS TO CURRENT POLL
-        database.query("SELECT * FROM poll_answers WHERE poll_id = ?", [poll_id], function(answer_error, answer_result, answer_fields) {
-          res.render('poll_detail', {
-            poll: poll_result[0],
-            poll_answers: answer_result
-          })
+    //GET CURRENT USER
+    database.query("SELECT * FROM user WHERE username = ?", [req.session.username], function(user_error, user_result, user_fields) {
+      if(user_result.length > 0) {
+        // GET CURRENT POLL
+        database.query("SELECT * FROM poll WHERE id = ?", [poll_id], function(poll_error, poll_result, poll_fields) {
+          if(poll_result.length > 0) {
+            // CURRENT POLL GOT
+            // GET ANSWERS TO CURRENT POLL
+            database.query("SELECT * FROM poll_answers WHERE poll_id = ?", [poll_id], function(answer_error, answer_result, answer_fields) {
+              // TODO: DOES USER ALREADY HAVE VOTED?
+              database.query("SELECT * FROM poll_votes WHERE poll_id = ? AND user_id = ?", [poll_id, user_result[0].id], function(existing_vote_error, existing_vote_result, existing_vote_fields) {
+                  res.render('poll_detail', {
+                    poll: poll_result[0],
+                    poll_answers: answer_result,
+                    selected_answer_id: existing_vote_result[0].answer_id || null
+                  });
+                  res.end();
+              })
+            })
+          } else {
+            res.redirect('/poll');
+          }
         })
       } else {
-        res.redirect('/poll');
+        res.redirect('/logout');
       }
     })
   } else {
@@ -470,24 +512,67 @@ app.post('/poll/:id/add', function(req, res) {
   let poll_id = req.params.id;
   let answer_text = req.body.text;
   if(req.session.loggedin) {
-    // GET CURRENT POLL
-    database.query("SELECT * FROM poll WHERE id = ?", [poll_id], function(poll_error, poll_result, poll_fields) {
-      if(poll_result.length > 0) {
-        // CURRENT POLL GOT
-        // GET ANSWERS TO CURRENT POLL
-        database.query("SELECT * FROM user WHERE username = ?", [req.session.username], function(user_error, user_result, user_fields) {
-          if(user_result.length > 0) {
-            database.query('INSERT INTO poll_answers (`title`, `creator_id`, `poll_id`) VALUES ("' + answer_text + '", ' + user_result[0].id + ', ' + poll_id + ')', function(err, insert_result) {
+    if(req.body.text != "") {
+      // GET CURRENT POLL
+      database.query("SELECT * FROM poll WHERE id = ?", [poll_id], function(poll_error, poll_result, poll_fields) {
+        if(poll_result.length > 0) {
+          // CURRENT POLL GOT
+          // GET ANSWERS TO CURRENT POLL
+          database.query("SELECT * FROM user WHERE username = ?", [req.session.username], function(user_error, user_result, user_fields) {
+            if(user_result.length > 0) {
+              database.query('INSERT INTO poll_answers (`title`, `creator_id`, `poll_id`) VALUES ("' + answer_text + '", ' + user_result[0].id + ', ' + poll_id + ')', function(err, insert_result) {
+                 if (err) throw err;
+                 res.redirect(`/poll/${poll_id}`);
+              })
+            }
+          })
+        } else {
+          res.redirect(`/poll/${poll_id}`);
+        }
+      })
+    } else {
+      res.redirect(`/poll/${poll_id}`);
+    }
+  } else {
+    res.redirect('/login');
+  }
+})
+
+app.post('/poll/:id/answer/:answer_id/vote', function(req, res) {
+  if(req.session.loggedin) {
+    let poll_id = req.params.id;
+    let answer_id = req.params.answer_id;
+
+    console.log(poll_id);
+    console.log(answer_id);
+
+    //GET CURRENT USER
+    database.query("SELECT * FROM user WHERE username = ?", [req.session.username], function(user_error, user_result, user_fields) {
+      if(user_result.length > 0) {
+        let user = user_result[0];
+
+        database.query("SELECT * FROM poll_votes WHERE poll_id = ? AND user_id = ?", [poll_id, user.id], function(existing_vote_error, existing_vote_result, existing_vote_fields) {
+          if(!existing_vote_result.length > 0) {
+            console.log(user.id);
+
+            database.query('INSERT INTO poll_votes (`user_id`, `answer_id`, `poll_id`) VALUES (' + user.id + ', ' + answer_id + ', ' + poll_id + ')', function(err, insert_result) {
                if (err) throw err;
                res.redirect(`/poll/${poll_id}`);
             })
+          } else {
+            console.log("Es existiert bereits eine antwort in dieser Umfrage.");
+            database.query("UPDATE poll_votes SET answer_id = ? WHERE poll_id = ? AND user_id = ?", [answer_id, poll_id, user.id], function(err, input_res) {
+              if(err) throw err;
+            })
+            res.redirect(`/poll/${poll_id}`)
           }
         })
+
       } else {
-        res.redirect(`/poll/${poll_id}`);
+        res.redirect("/logout")
       }
     })
   } else {
-    res.redirect('/login');
+    res.redirect('/login')
   }
 })

@@ -27,5 +27,5 @@ html
             div.account
               a(href=`/profile/${current_user.id}`)
                 h3 #{current_user.firstname} #{current_user.lastname}
-              a(href="/logout") logout
+              a.link--size-sm(href="/logout") logout
       block content
