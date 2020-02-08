@@ -1,5 +1,6 @@
 const express = require('express');
 const mysql = require('mysql');
+const https = require('https');
 const sassMiddleware = require('node-sass-middleware');
 const session = require('express-session');
 const bodyParser = require('body-parser');
@@ -11,7 +12,11 @@ var certificate = fs.readFileSync('cert.pem');
 
 var credentials = {key: privateKey, cert: certificate};
 
-const app = express().createServer(credentials);
+const app = express();
+
+const server = https.createServer(credentials, app).listen(8000, () => {
+  console.log(`express running at ${server.address().port}`);
+})
 
 const database = mysql.createConnection({
   host: "localhost",
@@ -24,10 +29,6 @@ database.connect(function(err) {
   if (err) throw err;
   console.log("Connected!");
 });
-
-const server = app.listen(8000, () => {
-  console.log(`express running at ${server.address().port}`);
-})
 
 app.set('view engine', 'pug');
 
