@@ -10,7 +10,7 @@ const app = express();
 const database = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: "mpi-08042304",
+  password: "O30gPEOs",
   database: "abi"
 })
 
@@ -81,6 +81,28 @@ app.get('/login', (req, res) => {
     error: req.session.error || null
   });
 });
+
+app.get('/change_password', (req, res) => {
+  res.render('change_password', {
+    error: req.session.error || null
+  });
+});
+
+app.post('/change', function(req, res) {
+  if(req.session.loggedin) {
+    if(req.body.old_password && req.body.old_password != "") {
+      if(req.body.password && req.body.password != "") {
+        database.query("SELECT * FROM user WHERE username = ?", [req.session.username], function(user_error, user_result, user_fields) {
+          if(user_result.length > 0) {
+            if(user_result[0].password == req.body.old_password) {
+              console.log("CHANGE");
+            }
+          }
+        })
+      }
+    }
+  }
+})
 
 app.post('/auth', function(request, response) {
 
