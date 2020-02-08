@@ -14,7 +14,10 @@ var credentials = {key: privateKey, cert: certificate};
 
 const app = express();
 
-const server = https.createServer(credentials, app).listen(8000, () => {
+const server = https.createServer({
+    key: fs.readFileSync('key.pem'),
+    cert: fs.readFileSync('cert.pem')
+  }, app).listen(8000, function() {
   console.log(`express running at ${server.address().port}`);
 })
 
