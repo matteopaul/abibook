@@ -11,7 +11,7 @@ var certificate = fs.readFileSync('cert.pem');
 
 var credentials = {key: privateKey, cert: certificate};
 
-const app = express(credentials);
+const app = express().createServer(credentials);
 
 const database = mysql.createConnection({
   host: "localhost",
