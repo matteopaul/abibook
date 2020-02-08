@@ -1,11 +1,37 @@
 const express = require('express');
 const mysql = require('mysql');
 const https = require('https');
+const http = require('http');
 const sassMiddleware = require('node-sass-middleware');
 const session = require('express-session');
 const bodyParser = require('body-parser');
 var path = require('path');
 var fs = require('fs');
+
+//
+//
+//
+//   HTTP SERVER
+//
+//
+//
+
+http.createServer(function(req, res) {
+  res.writeHead(301, { "Location": "https://" + req.headers['host'] + req.url });
+  res.end();
+}).listen(8000);
+
+
+//
+//
+//
+//
+//      HTTPS SERVER
+//
+//
+//
+
+
 
 var privateKey = fs.readFileSync('key.pem');
 var certificate = fs.readFileSync('cert.pem');
@@ -17,7 +43,7 @@ const app = express();
 const server = https.createServer({
     key: fs.readFileSync('key.pem'),
     cert: fs.readFileSync('cert.pem')
-  }, app).listen(8000, function() {
+  }, app).listen(8001, function() {
   console.log(`express running at ${server.address().port}`);
 })
 
@@ -52,22 +78,6 @@ app.use(session({
 	resave: true,
 	saveUninitialized: true
 }));
-
-//
-//
-//
-//      HTTPS REDIRECTION
-//
-//
-//
-//
-
-
-app.get('*', function(req, res) {
-  if(req.protocol == 'http') {
-    res.redirect('https://' + req.headers.host + req.url);
-  }
-})
 
 
 //
