@@ -19,7 +19,7 @@ database.connect(function(err) {
   console.log("Connected!");
 });
 
-const server = app.listen(80, () => {
+const server = app.listen(8000, () => {
   console.log(`express running at ${server.address().port}`);
 })
 
