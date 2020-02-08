@@ -17,7 +17,7 @@ var fs = require('fs');
 //
 
 http.createServer(function(req, res) {
-  res.writeHead(301, { "Location": "https://" + req.headers['host'] + req.url + ':8001'});
+  res.writeHead(301, { "Location": "https://" + req.headers['host'] + req.url});
   res.end();
 }).listen(8000);
 
