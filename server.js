@@ -53,7 +53,21 @@ app.use(session({
 	saveUninitialized: true
 }));
 
+//
+//
+//
+//      HTTPS REDIRECTION
+//
+//
+//
+//
 
+
+app.get('*', function(req, res) {
+  if(req.protocol == 'http') {
+    res.redirect('https://' + req.headers.host + req.url);
+  }
+})
 
 
 //
