@@ -6,8 +6,8 @@ const bodyParser = require('body-parser');
 var path = require('path');
 var fs = require('fs');
 
-var privateKey = fs.readFileSync('pem.key');
-var certificate = fs.readFileSync('cert.crt');
+var privateKey = fs.readFileSync('key.pem');
+var certificate = fs.readFileSync('cert.pem');
 
 var credentials = {key: privateKey, cert: certificate};
 
